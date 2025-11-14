@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GraphQL Query Interceptor - Test Page</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .section {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #333;
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    .instructions {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .instructions h3 {
+      color: #856404;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .instructions ol {
+      margin-left: 20px;
+      color: #856404;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .hash-display {
+      background: #2d2d2d;
+      color: #4caf50;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      word-break: break-all;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .hash-display:hover {
+      background: #3d3d3d;
+    }
+
+    .hash-display::before {
+      content: "Click to copy: ";
+      color: #999;
+      display: block;
+      margin-bottom: 5px;
+      font-size: 10px;
+    }
+
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button.secondary {
+      background: #f5f5f5;
+      color: #666;
+    }
+
+    button.secondary:hover {
+      background: #e0e0e0;
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      border-radius: 4px;
+      display: none;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    #result.show {
+      display: block;
+    }
+
+    #result.error {
+      background: #ffebee;
+      border-left-color: #f44336;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .status {
+      font-size: 12px;
+      color: #666;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .test-queries {
+      display: grid;
+      gap: 10px;
+    }
+
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+
+    .console-log {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 15px;
+    }
+
+    .console-log div {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 GraphQL Query Interceptor</h1>
+    <p class="subtitle">Test Page for Extension Development</p>
+
+    <div class="instructions">
+      <h3>📋 Testing Instructions:</h3>
+      <ol>
+        <li>Copy one of the test hashes below</li>
+        <li>Open the extension popup (click the icon in your toolbar)</li>
+        <li>Paste the hash and click "Add"</li>
+        <li>Come back here and click the corresponding "Send Test Query" button</li>
+        <li>Check the extension popup - the query should be captured!</li>
+      </ol>
+    </div>
+
+    <!-- Test 1: Simple Query -->
+    <div class="section">
+      <h2>Test 1: Simple User Query</h2>
+      <div class="hash-display" onclick="copyHash('test1Hash')">
+        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      </div>
+      <button onclick="sendTestQuery1()">Send Test Query 1</button>
+      <p class="status">Query: <code>user(id: $id) { name email }</code></p>
+    </div>
+
+    <!-- Test 2: Mutation -->
+    <div class="section">
+      <h2>Test 2: Create User Mutation</h2>
+      <div class="hash-display" onclick="copyHash('test2Hash')">
+        bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      </div>
+      <button onclick="sendTestQuery2()">Send Test Query 2</button>
+      <p class="status">Mutation: <code>createUser(input: $input) { id name }</code></p>
+    </div>
+
+    <!-- Test 3: Complex Query -->
+    <div class="section">
+      <h2>Test 3: Complex Nested Query</h2>
+      <div class="hash-display" onclick="copyHash('test3Hash')">
+        cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      </div>
+      <button onclick="sendTestQuery3()">Send Test Query 3</button>
+      <p class="status">Query with nested fields and fragments</p>
+    </div>
+
+    <!-- Test All -->
+    <div class="section">
+      <h2>🎯 Test All Queries</h2>
+      <button class="secondary" onclick="sendAllQueries()">Send All Test Queries</button>
+      <p class="status">Sends all three queries in sequence</p>
+    </div>
+
+    <div id="result"></div>
+
+    <div class="console-log" id="consoleLog">
+      <div style="color: #5c6370;">Console output will appear here...</div>
+    </div>
+  </div>
+
+  <script>
+    // Test hash values
+    const testHashes = {
+      test1: 'a'.repeat(64),
+      test2: 'b'.repeat(64),
+      test3: 'c'.repeat(64)
+    };
+
+    // Test queries
+    const testQueries = {
+      test1: {
+        query: `query GetUser($id: ID!) {
+  user(id: $id) {
+    id
+    name
+    email
+    createdAt
+  }
+}`,
+        operationName: 'GetUser',
+        variables: { id: '123' }
+      },
+      test2: {
+        query: `mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
+    id
+    name
+    email
+    success
+  }
+}`,
+        operationName: 'CreateUser',
+        variables: { input: { name: 'John Doe', email: 'john@example.com' } }
+      },
+      test3: {
+        query: `query GetUserWithPosts($userId: ID!) {
+  user(id: $userId) {
+    id
+    name
+    email
+    profile {
+      bio
+      avatar
+      website
+    }
+    posts(first: 10) {
+      edges {
+        node {
+          id
+          title
+          content
+          createdAt
+          comments {
+            id
+            text
+            author {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+        operationName: 'GetUserWithPosts',
+        variables: { userId: '456' }
+      }
+    };
+
+    // Log to console and display
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('consoleLog');
+      const color = type === 'error' ? '#ef5350' : type === 'success' ? '#4caf50' : '#61afef';
+      const timestamp = new Date().toLocaleTimeString();
+      logDiv.innerHTML += `<div style="color: ${color};">[${timestamp}] ${message}</div>`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(message);
+    }
+
+    // Copy hash to clipboard
+    function copyHash(hashId) {
+      const hash = testHashes[hashId.replace('Hash', '')];
+      navigator.clipboard.writeText(hash).then(() => {
+        showResult('Hash copied to clipboard! Now add it to the extension.', 'success');
+        log(`Copied hash: ${hash.substring(0, 16)}...`, 'success');
+      });
+    }
+
+    // Show result message
+    function showResult(message, type = 'success') {
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = message;
+      resultDiv.className = type === 'error' ? 'error show' : 'show';
+      
+      setTimeout(() => {
+        resultDiv.classList.remove('show');
+      }, 5000);
+    }
+
+    // Generic test query sender
+    async function sendTestQuery(testKey) {
+      const hash = testHashes[testKey];
+      const queryData = testQueries[testKey];
+
+      log(`Sending query with hash: ${hash.substring(0, 16)}...`, 'info');
+      
+      try {
+        // First request: Only hash (will be intercepted)
+        log('Step 1: Sending request with only hash...', 'info');
+        
+        const response1 = await fetch('https://httpbin.org/post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            operationName: queryData.operationName,
+            variables: queryData.variables,
+            extensions: {
+              persistedQuery: {
+                version: 1,
+                sha256Hash: hash
+              }
+            }
+          })
+        });
+
+        log('Step 2: Hash should be invalidated by extension...', 'info');
+        
+        // Wait a moment for interception
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Second request: Full query (what app sends after hash fails)
+        log('Step 3: Sending retry with full query...', 'info');
+        
+        const response2 = await fetch('https://httpbin.org/post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: queryData.query,
+            operationName: queryData.operationName,
+            variables: queryData.variables,
+            extensions: {
+              persistedQuery: {
+                version: 1,
+                sha256Hash: hash
+              }
+            }
+          })
+        });
+
+        const result = await response2.json();
+        
+        log('✓ Query sent successfully! Check the extension popup.', 'success');
+        showResult(
+          `✅ Test query sent! Check the extension popup to see the captured query for: ${queryData.operationName}`,
+          'success'
+        );
+
+      } catch (error) {
+        log(`✗ Error: ${error.message}`, 'error');
+        showResult(`❌ Error: ${error.message}`, 'error');
+      }
+    }
+
+    // Individual test functions
+    function sendTestQuery1() {
+      sendTestQuery('test1');
+    }
+
+    function sendTestQuery2() {
+      sendTestQuery('test2');
+    }
+
+    function sendTestQuery3() {
+      sendTestQuery('test3');
+    }
+
+    // Send all queries
+    async function sendAllQueries() {
+      log('=== Sending all test queries ===', 'info');
+      showResult('Sending all test queries...', 'info');
+      
+      await sendTestQuery('test1');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      await sendTestQuery('test2');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      await sendTestQuery('test3');
+      
+      log('=== All queries sent! ===', 'success');
+      showResult('✅ All test queries sent! Check the extension popup.', 'success');
+    }
+
+    // Initialize
+    log('Test page loaded. Ready for testing!', 'info');
+    log('Make sure the extension is installed and enabled.', 'info');
+  </script>
+</body>
+</html>
+

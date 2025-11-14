@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GraphQL Query Interceptor</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>GraphQL Query Interceptor</h1>
+      <div class="status-indicator">
+        <label class="toggle-switch">
+          <input type="checkbox" id="enableToggle" checked>
+          <span class="slider"></span>
+        </label>
+        <span id="statusText" class="status-text">Active</span>
+      </div>
+    </header>
+
+    <!-- Hash Input Section -->
+    <section class="section hash-input-section">
+      <h2>Add Query Hash</h2>
+      <div class="input-group">
+        <input 
+          type="text" 
+          id="hashInput" 
+          placeholder="Paste sha256Hash here (e.g., from Network tab)"
+          maxlength="64"
+        >
+        <button id="addHashBtn" class="btn btn-primary">Add</button>
+      </div>
+      <p class="help-text">
+        Copy the sha256Hash from your browser's Network tab and paste it here to track the query.
+      </p>
+      <div id="inputError" class="error-message"></div>
+    </section>
+
+    <!-- Tracked Hashes Section -->
+    <section class="section tracked-hashes-section">
+      <div class="section-header">
+        <h2>Tracked Hashes (<span id="hashCount">0</span>)</h2>
+        <button id="clearHashesBtn" class="btn btn-secondary btn-sm">Clear All</button>
+      </div>
+      <div id="trackedHashesList" class="tracked-hashes-list">
+        <p class="empty-state">No hashes tracked yet. Add a hash above to get started.</p>
+      </div>
+    </section>
+
+    <!-- Captured Queries Section -->
+    <section class="section captured-queries-section">
+      <div class="section-header">
+        <h2>Captured Queries (<span id="queryCount">0</span>)</h2>
+        <button id="clearQueriesBtn" class="btn btn-secondary btn-sm">Clear All</button>
+      </div>
+      <div id="capturedQueriesList" class="captured-queries-list">
+        <p class="empty-state">No queries captured yet. Trigger the tracked queries on the webpage.</p>
+      </div>
+    </section>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
+
